@@ -27,8 +27,6 @@ export const initialCards = [
   },
 ]
 
-// @todo: Темплейт карточки
-
 // @todo: Функция создания карточки
 
 export function createCard(cardData, toggleLike, openImageModal) {
@@ -56,7 +54,3 @@ export function createCard(cardData, toggleLike, openImageModal) {
 
   return cardElement
 }
-
-// Функция удаления карточки
-
-// Функция лайка карточки

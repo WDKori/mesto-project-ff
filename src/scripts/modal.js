@@ -1,11 +1,5 @@
 // Открытие попапа
 export function openModal(popup) {
-  console.log('Открываем попап:', popup)
-
-  if (!popup) {
-    console.error('Ошибка: переданный popup не найден!')
-    return
-  }
   popup.classList.add('popup_is-opened')
   document.addEventListener('keydown', closeModalOnEsc)
 }
@@ -32,17 +26,4 @@ export function closeModalOnOverlayClick(evt) {
   if (evt.target.classList.contains('popup')) {
     closeModal(evt.target)
   }
-}
-
-// Открытие попапа с изображением
-export function openImageModal(link, name) {
-  const imagePopup = document.querySelector('.popup_type_image')
-  const imagePopupImg = imagePopup.querySelector('.popup__image')
-  const imagePopupCaption = imagePopup.querySelector('.popup__caption')
-
-  imagePopupImg.src = link
-  imagePopupImg.alt = name
-  imagePopupCaption.textContent = name
-
-  openModal(imagePopup)
 }

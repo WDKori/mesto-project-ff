@@ -1,11 +1,6 @@
 import '../pages/index.css'
 import { createCard, initialCards } from './cards.js'
-import {
-  openModal,
-  closeModal,
-  closeModalOnOverlayClick,
-  openImageModal,
-} from './modal.js'
+import { openModal, closeModal, closeModalOnOverlayClick } from './modal.js'
 
 // @todo: DOM узлы
 export const cardTemplate = document
@@ -21,7 +16,7 @@ const editProfileButton = document.querySelector('.profile__edit-button')
 const profileTitle = document.querySelector('.profile__title')
 const profileDescription = document.querySelector('.profile__description')
 const editPopup = document.querySelector('.popup_type_edit')
-const editProfileForm = document.querySelector('.popup__form')
+const editProfileForm = editPopup.querySelector('.popup__form')
 const profileNameInput = editProfileForm.querySelector(
   '.popup__input_type_name'
 )
@@ -64,6 +59,15 @@ addCardButton.addEventListener('click', () => {
   openModal(addPopup)
 })
 
+// Открытие попапа с изображением
+export function openImageModal(link, name) {
+  imagePopupImg.src = link
+  imagePopupImg.alt = name
+  imagePopupCaption.textContent = name
+
+  openModal(imagePopup)
+}
+
 // Обработчик отправки формы для редактирования профиля
 
 editProfileForm.addEventListener('submit', (evt) => {
@@ -83,7 +87,7 @@ addCardForm.addEventListener('submit', (evt) => {
     link: cardLinkInput.value,
   }
 
-  const newCard = createCard(cardData)
+  const newCard = createCard(cardData, toggleLike, openImageModal)
   cardsContainer.prepend(newCard)
 
   closeModal(addCardForm.closest('.popup'))
