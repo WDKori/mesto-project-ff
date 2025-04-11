@@ -1,11 +1,13 @@
 {
   "name": "mesto-project-ff",
   "version": "1.0.0",
+  "homepage": "https://wdkori.github.io/mesto-project-ff",
   "description": "git@github.com:WDKori/mesto-project-ff.git",
   "main": "index.js",
   "scripts": {
     "build": "rd /s /q dist && webpack",
     "dev": "webpack serve --open",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
   "keywords": [],
