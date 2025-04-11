@@ -8,12 +8,12 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Mesto</title>
-  <script defer src="./main.js"></script><link href="./main.css" rel="stylesheet"></head>
+  <script defer src="main.js"></script><link href="main.css" rel="stylesheet"></head>
   <body class="page">
     <div class="page__content">
       <header class="header page__section">
         <img
-          src="./0863e5bc26221680f1e2.svg"
+          src="0863e5bc26221680f1e2.svg"
           alt="Логотип проекта масто"
           class="logo header__logo"
         />
@@ -22,7 +22,7 @@
         <section class="profile page__section">
           <div
             class="profile__image"
-            style="background-image: url(./6666407ac3aa5af1d5de.jpg"
+            style="background-image: url(6666407ac3aa5af1d5de.jpg"
           ></div>
           <div class="profile__info">
             <h1 class="profile__title">Жак-Ив Кусто</h1>
@@ -43,20 +43,32 @@
           <button type="button" class="popup__close"></button>
           <h3 class="popup__title">Редактировать профиль</h3>
           <form class="popup__form" name="edit-profile">
-            <input
-              type="text"
-              name="name"
-              class="popup__input popup__input_type_name"
-              placeholder="Имя"
-              required
-            />
-            <input
-              type="text"
-              name="description"
-              class="popup__input popup__input_type_description"
-              placeholder="Занятие"
-              required
-            />
+            <fieldset class="popup__fieldset">
+              <input
+                type="text"
+                name="name"
+                id="profile-name-input"
+                class="popup__input popup__input_type_name"
+                placeholder="Имя"
+                required
+                minlength="2"
+                maxlength="40"
+                data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+              />
+              <span class="popup__input-error profile-name-input-error"></span>
+              <input
+                type="text"
+                name="description"
+                id="profile-about-input"
+                class="popup__input popup__input_type_description"
+                placeholder="Занятие"
+                required
+                minlength="2"
+                maxlength="200"
+                data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+              />
+              <span class="popup__input-error profile-about-input-error"></span>
+            </fieldset>
             <button type="submit" class="button popup__button">
               Сохранить
             </button>
@@ -68,20 +80,28 @@
           <button type="button" class="popup__close"></button>
           <h3 class="popup__title">Новое место</h3>
           <form class="popup__form" name="new-place">
-            <input
-              type="text"
-              name="place-name"
-              class="popup__input popup__input_type_card-name"
-              placeholder="Название"
-              required
-            />
-            <input
-              type="url"
-              name="link"
-              class="popup__input popup__input_type_url"
-              placeholder="Ссылка на картинку"
-              required
-            />
+            <fieldset class="popup__fieldset">
+              <input
+                type="text"
+                id="card-title-input"
+                class="popup__input popup__input_type_card-title"
+                placeholder="Название"
+                required
+                minlength="2"
+                maxlength="30"
+                data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+              />
+              <span class="popup__input-error card-title-input-error"></span>
+              <input
+                type="url"
+                name="link"
+                id="card-link-input"
+                class="popup__input popup__input_type_card-link"
+                placeholder="Ссылка на картинку"
+                required
+              />
+              <span class="popup__input-error card-link-input-error"></span>
+            </fieldset>
             <button type="submit" class="button popup__button">
               Сохранить
             </button>
