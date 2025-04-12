@@ -1,8 +1,14 @@
-import { cardTemplate, openConfirmPopup } from './index.js'
+import { cardTemplate } from './index.js'
 
 // @todo: Функция создания карточки
 
-export function createCard(cardData, toggleLike, openImageModal, userId) {
+export function createCard(
+  cardData,
+  toggleLike,
+  deleteCallback,
+  openImageModal,
+  userId
+) {
   const cardElement = cardTemplate.cloneNode(true)
   const cardImage = cardElement.querySelector('.card__image')
   const cardTitle = cardElement.querySelector('.card__title')
@@ -13,10 +19,6 @@ export function createCard(cardData, toggleLike, openImageModal, userId) {
   cardImage.src = cardData.link
   cardImage.alt = cardData.name
   cardTitle.textContent = cardData.name
-
-  if (cardData.owner._id !== userId) {
-    deleteButton.remove()
-  }
 
   // Установка количества лайков
   likeCount.textContent = cardData.likes.length
@@ -38,13 +40,12 @@ export function createCard(cardData, toggleLike, openImageModal, userId) {
 
   // Удаление доступно только владельцу
 
-  if (cardData.owner._id !== userId) {
-    deleteButton.remove()
-  } else {
-    // Обработчик для удаления карточки
+  if (cardData.owner._id === userId) {
     deleteButton.addEventListener('click', () => {
-      openConfirmPopup(cardElement, cardData._id)
+      deleteCallback(cardElement, cardData._id) // Используем переданный колбэк
     })
+  } else {
+    deleteButton.remove()
   }
 
   return cardElement

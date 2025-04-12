@@ -2,10 +2,6 @@
   margin-top: 27px;
 }
 
-.popup__form[name='edit-avatar'] {
-  margin: 0;
-}
-
 .popup__fieldset {
   border: none;
   margin: 0;

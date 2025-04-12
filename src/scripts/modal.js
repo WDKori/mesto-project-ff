@@ -30,12 +30,3 @@ export function closeModalOnOverlayClick(evt) {
     closeModal(evt.target)
   }
 }
-
-export function getCardToDelete() {
-  return { cardToDelete, cardIdToDelete }
-}
-
-export function clearCardToDelete() {
-  cardToDelete = null
-  cardIdToDelete = null
-}

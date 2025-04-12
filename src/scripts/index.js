@@ -1,5 +1,5 @@
 import '../pages/index.css'
-import { createCard } from './cards.js'
+import { createCard } from './card.js'
 import { openModal, closeModal, closeModalOnOverlayClick } from './modal.js'
 import { enableValidation, clearValidation } from './validate.js'
 import {
@@ -79,6 +79,7 @@ Promise.all([getUserInfo(), getInitialCards()])
       const cardElement = createCard(
         cardData,
         toggleLike,
+        handleDelete,
         openImageModal,
         currentUserId
       )
@@ -120,15 +121,20 @@ export function openImageModal(link, name) {
 export function openConfirmPopup(cardElement, cardId) {
   openModal(confirmPopup)
 
-  confirmForm.addEventListener('submit', (evt) => {
+  const deleteButton = confirmPopup.querySelector('.popup__button_type_delete')
+
+  deleteButton.onclick = null
+
+  deleteButton.onclick = (evt) => {
     evt.preventDefault()
+
     deleteCard(cardId)
       .then(() => {
         cardElement.remove()
         closeModal(confirmPopup)
       })
       .catch((err) => console.error('Ошибка при удалении карточки:', err))
-  })
+  }
 }
 
 // Обработчик формы для редактирования аватара
@@ -195,7 +201,13 @@ addCardForm.addEventListener('submit', (evt) => {
 
   addNewCard({ name, link })
     .then((cardData) => {
-      const newCard = createCard(cardData, toggleLike, openImageModal)
+      const newCard = createCard(
+        cardData,
+        toggleLike,
+        handleDelete,
+        openImageModal,
+        currentUserId
+      )
       cardsContainer.prepend(newCard)
 
       closeModal(addCardForm.closest('.popup'))
@@ -230,22 +242,32 @@ addCardButton.addEventListener('click', () => {
 
 // Функция лайка карточки
 export function toggleLike(likeButton, cardId) {
+  const cardElement = likeButton.closest('.card')
+  const likeCountElement = cardElement.querySelector('.card__like-count')
   const isLiked = likeButton.classList.contains('card__like-button_is-active')
-  if (isLiked) {
-    unlikeCard(cardId)
-      .then((cardData) => {
-        likeButton.classList.remove('card__like-button_is-active')
-        likeCount.textContent = cardData.likes.length
-      })
-      .catch((err) => console.error('Ошибка при снятии лайка:', err))
-  } else {
-    likeCard(cardId)
-      .then((cardData) => {
-        likeButton.classList.add('card__like-button_is-active')
-        likeCount.textContent = cardData.likes.length
-      })
-      .catch((err) => console.error('Ошибка при постановке лайка:', err))
-  }
+
+  likeButton.disabled = true
+
+  const apiMethod = isLiked ? unlikeCard : likeCard
+  const actionName = isLiked ? 'снятии' : 'постановке'
+
+  apiMethod(cardId)
+    .then((cardData) => {
+      likeButton.classList.toggle('card__like-button_is-active')
+      likeCountElement.textContent = cardData.likes.length
+    })
+    .catch((err) => {
+      console.error(`Ошибка при ${actionName} лайка:`, err)
+    })
+    .finally(() => {
+      likeButton.disabled = false
+    })
+}
+
+// Функция удаления карточки
+
+function handleDelete(cardElement, cardId) {
+  openConfirmPopup(cardElement, cardId)
 }
 
 // Закрытие попапов

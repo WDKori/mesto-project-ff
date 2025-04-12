@@ -1,7 +1,3 @@
-// Регулярные выражения для проверки полей
-const nameRegex = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/
-const urlRegex = /^(https?:\/\/)[^\s]+$/
-
 // Функция показа ошибки
 const showInputError = (formElement, inputElement, errorMessage, settings) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`)
@@ -18,33 +14,28 @@ const hideInputError = (formElement, inputElement, settings) => {
   errorElement.classList.remove(settings.errorClass)
 }
 
-// Проверка валидности поля с кастомными правилами
+// Отключение кнопки submit
+const disableSubmitButton = (buttonElement, settings) => {
+  buttonElement.disabled = true
+  buttonElement.classList.add(settings.inactiveButtonClass)
+}
+
+// Проверка валидности поля
 const checkInputValidity = (formElement, inputElement, settings) => {
-  if (!inputElement.validity.valid) {
+  if (inputElement.validity.patternMismatch) {
+    // Кастомное сообщение только для ошибки паттерна
+    showInputError(
+      formElement,
+      inputElement,
+      inputElement.dataset.errorMessage,
+      settings
+    )
+  } else if (!inputElement.validity.valid) {
+    // Стандартные сообщения браузера для других ошибок
     showInputError(
       formElement,
       inputElement,
       inputElement.validationMessage,
-      settings
-    )
-  } else if (
-    (inputElement.name === 'name' || inputElement.name === 'place-name') &&
-    !nameRegex.test(inputElement.value)
-  ) {
-    showInputError(
-      formElement,
-      inputElement,
-      inputElement.dataset.error,
-      settings
-    )
-  } else if (
-    inputElement.name === 'link' &&
-    !urlRegex.test(inputElement.value)
-  ) {
-    showInputError(
-      formElement,
-      inputElement,
-      'Введите корректный URL',
       settings
     )
   } else {
@@ -54,21 +45,13 @@ const checkInputValidity = (formElement, inputElement, settings) => {
 
 // Проверка всех полей формы
 const hasInvalidInput = (inputList) => {
-  return inputList.some((inputElement) => {
-    if (inputElement.name === 'name' || inputElement.name === 'place-name') {
-      return !inputElement.validity.valid || !nameRegex.test(inputElement.value)
-    } else if (inputElement.name === 'link') {
-      return !inputElement.validity.valid || !urlRegex.test(inputElement.value)
-    }
-    return !inputElement.validity.valid
-  })
+  return inputList.some((inputElement) => !inputElement.validity.valid)
 }
 
 // Переключение состояния кнопки
 const toggleButtonState = (inputList, buttonElement, settings) => {
   if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true
-    buttonElement.classList.add(settings.inactiveButtonClass)
+    disableSubmitButton(buttonElement, settings)
   } else {
     buttonElement.disabled = false
     buttonElement.classList.remove(settings.inactiveButtonClass)
@@ -111,6 +94,5 @@ export const clearValidation = (formElement, settings) => {
     hideInputError(formElement, inputElement, settings)
   })
 
-  buttonElement.disabled = true
-  buttonElement.classList.add(settings.inactiveButtonClass)
+  disableSubmitButton(buttonElement, settings)
 }
