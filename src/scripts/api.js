@@ -1,4 +1,13 @@
-export { getUserInfo, getInitialCards, updateUserInfo, addNewCard }
+export {
+  getUserInfo,
+  getInitialCards,
+  updateUserInfo,
+  addNewCard,
+  updateAvatar,
+  unlikeCard,
+  likeCard,
+  deleteCard,
+}
 
 const config = {
   baseUrl: 'https://nomoreparties.co/v1/wff-cohort-35',
@@ -54,4 +63,64 @@ function addNewCard({ name, link }) {
     }
     return Promise.reject(`Ошибка: ${res.status}`)
   })
+}
+
+function deleteCard(cardId) {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: config.headers,
+  }).then((res) => {
+    if (res.ok) {
+      return res.json()
+    }
+    return Promise.reject(`Ошибка: ${res.status}`)
+  })
+}
+
+function likeCard(cardId) {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: 'PUT',
+    headers: config.headers,
+  }).then((res) => {
+    if (res.ok) {
+      return res.json()
+    }
+    return Promise.reject(`Ошибка: ${res.status}`)
+  })
+}
+
+function unlikeCard(cardId) {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: 'DELETE',
+    headers: config.headers,
+  }).then((res) => {
+    if (res.ok) {
+      return res.json()
+    }
+    return Promise.reject(`Ошибка: ${res.status}`)
+  })
+}
+
+function updateAvatar(avatarUrl) {
+  return fetch(`${config.baseUrl}/users/me/avatar`, {
+    method: 'PATCH',
+    headers: config.headers,
+    body: JSON.stringify({
+      avatar: avatarUrl,
+    }),
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json()
+      }
+      return Promise.reject(`Ошибка: ${res.status}`)
+    })
+    .then((data) => {
+      console.log('Данные от сервера при обновлении аватара:', data)
+      return data
+    })
+    .catch((err) => {
+      console.error('Ошибка при обновлении аватара:', err)
+      return null
+    })
 }

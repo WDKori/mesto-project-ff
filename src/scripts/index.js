@@ -7,6 +7,10 @@ import {
   getInitialCards,
   updateUserInfo,
   addNewCard,
+  deleteCard,
+  unlikeCard,
+  likeCard,
+  updateAvatar,
 } from './api.js'
 
 // @todo: DOM узлы
@@ -18,6 +22,12 @@ const cardsContainer = document.querySelector('.places__list')
 
 const popups = document.querySelectorAll('.popup')
 const closeButtons = document.querySelectorAll('.popup__close')
+
+const avatarEditButton = document.querySelector('.profile__edit-avatar-button')
+const avatarPopup = document.querySelector('.popup_type_edit-avatar')
+const avatarForm = avatarPopup.querySelector('.popup__form')
+const avatarInput = avatarForm.querySelector('.popup__input_type_avatar')
+const profileImage = document.querySelector('.profile__image')
 
 const editProfileButton = document.querySelector('.profile__edit-button')
 const profileTitle = document.querySelector('.profile__title')
@@ -40,6 +50,9 @@ export const imagePopup = document.querySelector('.popup_type_image')
 export const imagePopupImg = imagePopup.querySelector('.popup__image')
 export const imagePopupCaption = imagePopup.querySelector('.popup__caption')
 
+const confirmPopup = document.querySelector('.popup_type_confirm-delete')
+const confirmForm = confirmPopup.querySelector('.popup__form')
+
 const validationConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -58,6 +71,10 @@ Promise.all([getUserInfo(), getInitialCards()])
     profileDescription.textContent = userData.about
     currentUserId = userData._id
 
+    if (userData.avatar) {
+      profileImage.style.backgroundImage = `url(${userData.avatar})`
+    }
+
     cards.reverse().forEach((cardData) => {
       const cardElement = createCard(
         cardData,
@@ -65,7 +82,7 @@ Promise.all([getUserInfo(), getInitialCards()])
         openImageModal,
         currentUserId
       )
-      cardsContainer.append(cardElement)
+      cardsContainer.prepend(cardElement)
     })
   })
   .catch((err) => console.error(`Ошибка при загрузке данных: ${err}`))
@@ -83,6 +100,12 @@ addCardButton.addEventListener('click', () => {
   openModal(addPopup)
 })
 
+// Открытие попапа аватара
+avatarEditButton.addEventListener('click', () => {
+  avatarForm.reset()
+  openModal(avatarPopup)
+})
+
 // Открытие попапа с изображением
 export function openImageModal(link, name) {
   imagePopupImg.src = link
@@ -92,6 +115,45 @@ export function openImageModal(link, name) {
   openModal(imagePopup)
 }
 
+// Открытие попапа с подтверждением удаления
+
+export function openConfirmPopup(cardElement, cardId) {
+  openModal(confirmPopup)
+
+  confirmForm.addEventListener('submit', (evt) => {
+    evt.preventDefault()
+    deleteCard(cardId)
+      .then(() => {
+        cardElement.remove()
+        closeModal(confirmPopup)
+      })
+      .catch((err) => console.error('Ошибка при удалении карточки:', err))
+  })
+}
+
+// Обработчик формы для редактирования аватара
+
+avatarForm.addEventListener('submit', (evt) => {
+  evt.preventDefault()
+  const avatarUrl = avatarInput.value
+  const submitButton = avatarForm.querySelector(
+    validationConfig.submitButtonSelector
+  )
+  submitButton.textContent = 'Сохранение...'
+  submitButton.disabled = true
+
+  updateAvatar(avatarUrl)
+    .then((res) => {
+      profileImage.style.backgroundImage = `url(${res.avatar})`
+      closeModal(avatarPopup)
+    })
+    .catch((err) => console.error('Ошибка при обновлении аватара:', err))
+    .finally(() => {
+      submitButton.textContent = 'Сохранить'
+      submitButton.disabled = false
+    })
+})
+
 // Обработчик отправки формы для редактирования профиля
 
 editProfileForm.addEventListener('submit', (evt) => {
@@ -99,6 +161,11 @@ editProfileForm.addEventListener('submit', (evt) => {
 
   const name = profileNameInput.value
   const about = profileDescriptionInput.value
+  const submitButton = editProfileForm.querySelector(
+    validationConfig.submitButtonSelector
+  )
+  submitButton.textContent = 'Сохранение...'
+  submitButton.disabled = true
 
   updateUserInfo({ name, about })
     .then((userData) => {
@@ -108,6 +175,10 @@ editProfileForm.addEventListener('submit', (evt) => {
       editProfileForm.reset()
     })
     .catch((err) => console.error(`Ошибка при обновлении профиля: ${err}`))
+    .finally(() => {
+      submitButton.textContent = 'Сохранить'
+      submitButton.disabled = false
+    })
 })
 
 // Обработчик отправки формы для добавления карточки
@@ -116,6 +187,11 @@ addCardForm.addEventListener('submit', (evt) => {
 
   const name = cardNameInput.value
   const link = cardLinkInput.value
+  const submitButton = addCardForm.querySelector(
+    validationConfig.submitButtonSelector
+  )
+  submitButton.textContent = 'Сохранение...'
+  submitButton.disabled = true
 
   addNewCard({ name, link })
     .then((cardData) => {
@@ -127,6 +203,10 @@ addCardForm.addEventListener('submit', (evt) => {
     })
     .catch((err) => {
       console.error(`Ошибка при добавлении карточки: ${err}`)
+    })
+    .finally(() => {
+      submitButton.textContent = 'Добавить'
+      submitButton.disabled = false
     })
 })
 
@@ -149,8 +229,23 @@ addCardButton.addEventListener('click', () => {
 })
 
 // Функция лайка карточки
-export function toggleLike(likeButton) {
-  likeButton.classList.toggle('card__like-button_is-active')
+export function toggleLike(likeButton, cardId) {
+  const isLiked = likeButton.classList.contains('card__like-button_is-active')
+  if (isLiked) {
+    unlikeCard(cardId)
+      .then((cardData) => {
+        likeButton.classList.remove('card__like-button_is-active')
+        likeCount.textContent = cardData.likes.length
+      })
+      .catch((err) => console.error('Ошибка при снятии лайка:', err))
+  } else {
+    likeCard(cardId)
+      .then((cardData) => {
+        likeButton.classList.add('card__like-button_is-active')
+        likeCount.textContent = cardData.likes.length
+      })
+      .catch((err) => console.error('Ошибка при постановке лайка:', err))
+  }
 }
 
 // Закрытие попапов

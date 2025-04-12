@@ -1,3 +1,6 @@
+let cardToDelete = null
+let cardIdToDelete = null
+
 // Открытие попапа
 export function openModal(popup) {
   popup.classList.add('popup_is-opened')
@@ -26,4 +29,13 @@ export function closeModalOnOverlayClick(evt) {
   if (evt.target.classList.contains('popup')) {
     closeModal(evt.target)
   }
+}
+
+export function getCardToDelete() {
+  return { cardToDelete, cardIdToDelete }
+}
+
+export function clearCardToDelete() {
+  cardToDelete = null
+  cardIdToDelete = null
 }
